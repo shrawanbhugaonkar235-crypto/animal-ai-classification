@@ -57,6 +57,15 @@ try:
 except Exception as exc:
     model_error = str(exc)
 
+@app.get("/")
+def root():
+    return {
+        "name": "Animal Vision AI",
+        "status": "running",
+        "message": "Python AI API is online. Use /api/health, /api/classes and POST /api/predict.",
+        "api_docs": "/docs"
+    }
+
 app = FastAPI(
     title="Animal Vision AI",
     version="1.0.0",
