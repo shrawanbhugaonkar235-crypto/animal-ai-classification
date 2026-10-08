@@ -1,3 +1,5 @@
+const API_BASE=(window.ANIMAL_AI_API||"").replace(/\/$/,"");
+const api=u=>API_BASE+u;
 const $=id=>document.getElementById(id);
 let selected=null,detections=[];
 document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.view)));
@@ -35,7 +37,7 @@ async function analyze(){
   $("loading").classList.remove("hidden");$("analyze").disabled=true;hideError();
   try{
     const file=await compressImage(selected),fd=new FormData();fd.append("file",file);
-    const r=await fetch("/api/predict",{method:"POST",body:fd}),d=await r.json();
+    const r=await fetch(api("/api/predict",{method:"POST",body:fd}),d=await r.json();
     if(!r.ok)throw Error(d.detail||"Prediction failed.");
     detections=d.detections||[]; $("results").classList.remove("hidden");
     $("total").textContent=d.total_detections;$("land").textContent=d.summary.land_animals;$("sea").textContent=d.summary.sea_animals;$("birds").textContent=d.summary.birds;$("avg").textContent=d.summary.average_confidence+"%";$("ptime").textContent=d.processing_time_ms+" ms";$("model").textContent=d.model_name;$("output").src=d.annotated_image+"?t="+Date.now();renderList()
@@ -49,8 +51,8 @@ function renderList(){
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[s]))}
 async function load(){
   try{
-    const h=await (await fetch("/api/health")).json();$("health").textContent=h.model_loaded?"Model ready · "+h.model_name:"Model unavailable";$("health").className="status "+(h.model_loaded?"ok":"bad");
-    const c=await (await fetch("/api/classes")).json();const set=new Set(c.actual_model_classes.map(x=>x.toLowerCase().trim()));
+    const h=await (await fetch(api("/api/health")).json();$("health").textContent=h.model_loaded?"Model ready · "+h.model_name:"Model unavailable";$("health").className="status "+(h.model_loaded?"ok":"bad");
+    const c=await (await fetch(api("/api/classes")).json();const set=new Set(c.actual_model_classes.map(x=>x.toLowerCase().trim()));
     $("coverage").innerHTML=c.model_loaded?`<b>Loaded model:</b> ${escapeHtml(c.model_name)} · <b>${c.actual_model_classes.length}</b> actual classes. Classes not in the model are marked as training-required.`:"<b>AI model unavailable.</b> Add trained weights or configure a compatible model.";
     const intended=c.classes||[];const groups={landClasses:[],seaClasses:[],birdClasses:[]};
     for(const x of intended){const k=x.category==="Land Animals"?"landClasses":x.category==="Sea Animals"?"seaClasses":"birdClasses";groups[k].push(x)}
