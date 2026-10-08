@@ -76,8 +76,8 @@ async def predict(file: UploadFile = File(...)):
     if not data or len(data) > MAX_MB * 1024 * 1024:
         raise HTTPException(400, f"Invalid or oversized image. Maximum {MAX_MB:g} MB.")
     try:
-        image = Image.open(io.BytesIO(data)).convert("RGB")
-        image.verify()
+        check = Image.open(io.BytesIO(data))
+        check.verify()
         image = Image.open(io.BytesIO(data)).convert("RGB")
     except (UnidentifiedImageError, OSError, ValueError):
         raise HTTPException(400, "The uploaded file is not a valid image.")
