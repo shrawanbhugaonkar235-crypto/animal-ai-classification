@@ -1,0 +1,35 @@
+# Copy to dataset/data.yaml and update paths/classes.
+path: ./dataset
+train: images/train
+val: images/val
+
+names:
+  0: dog
+  1: cat
+  2: lion
+  3: tiger
+  4: elephant
+  5: horse
+  6: deer
+  7: bear
+  8: giraffe
+  9: zebra
+  10: shark
+  11: dolphin
+  12: whale
+  13: octopus
+  14: jellyfish
+  15: crab
+  16: turtle
+  17: eagle
+  18: sparrow
+  19: crow
+  20: parrot
+  21: peacock
+  22: pigeon
+  23: owl
+  24: hawk
+  25: flamingo
+  26: penguin
+  27: ostrich
+  28: kingfisher
