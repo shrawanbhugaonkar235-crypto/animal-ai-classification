@@ -1,3 +1,2 @@
-// Set this to your deployed Python API URL.
-// Example: window.ANIMAL_AI_API = "https://your-python-api.onrender.com";
-window.ANIMAL_AI_API = "";
+// Python AI API deployed on Render
+window.ANIMAL_AI_API = "https://animal-ai-classification-4.onrender.com";
