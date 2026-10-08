@@ -1,99 +1,105 @@
-# AI-Based Classification and Localization of Animals, Sea Animals and Birds
+# AI-Based Classification and Localization of Animals, Sea Animals and Birds Using Python
 
-This repository is the **actual Python AI project**, not just a website.
+This repository contains the **actual Python computer-vision project**, not a website.
 
-## What it does
+## Project objective
 
-Given an image, the project can:
+The system detects animals in an image or camera feed, identifies the class supplied by the trained model, localizes each object with a bounding box, and reports the confidence of each individual prediction.
 
-- detect multiple objects
-- identify the class supplied by the AI model
-- group supported classes into Land Animal / Sea Animal / Bird
-- calculate an individual prediction confidence
-- generate bounding boxes
-- save an annotated output image
-- save a machine-readable JSON result
-- run webcam inference
-- train a custom YOLO model on a multi-species dataset
+The expanded project scope is:
+
+- Land / general animals
+- Sea / aquatic animals
+- Birds
 
 ## Important accuracy rule
 
-A prediction confidence such as 94.2% is **not** overall model accuracy.
+A prediction confidence such as `94.72%` is **not** the overall model accuracy.
 
-Overall accuracy must be measured against a validation/test dataset. This project never generates fake accuracy values.
+Overall model accuracy must be calculated on a validation/test dataset. This project never creates random or fabricated accuracy numbers.
 
-## Model strategy
+## Technology
 
-### Quick testing
-If `models/best.pt` exists, it is loaded.
+- Python
+- YOLO / Ultralytics
+- OpenCV
+- NumPy
+- Pillow
+- Matplotlib
 
-Otherwise the program can load an Ultralytics pretrained model automatically.
+## Project structure
 
-### Full project requirement
-To identify the complete requested collection of land animals, sea animals and birds, use a custom dataset and train/fine-tune a YOLO detector with those exact classes.
+```text
+animal-ai-classification/
+├── project.py
+├── predict.py
+├── train.py
+├── evaluate.py
+├── requirements.txt
+├── .env.example
+├── .python-version
+├── models/
+│   ├── best.pt              # your trained model
+│   └── README.md
+├── dataset/
+│   └── data.yaml.example
+├── outputs/
+│   └── .gitkeep
+└── README.md
+```
 
-The repository includes `dataset/data.yaml.example` as a starting configuration.
+## Installation
 
-## Run
-
-Create environment:
+Windows PowerShell:
 
 ```powershell
 python -m venv venv
 venv\Scripts\activate
-pip install -r backend/requirements.txt
+pip install -r requirements.txt
 ```
 
-Run image detection:
+## Model
+
+Set the model path through `.env`:
+
+```text
+MODEL_PATH=models/best.pt
+CONFIDENCE_THRESHOLD=0.25
+```
+
+If `models/best.pt` exists, it is loaded.
+
+For testing without a custom model, the project can use an Ultralytics pretrained model. However, a pretrained model can only predict the classes it was trained on.
+
+## Image prediction
 
 ```powershell
 python predict.py "images/tiger.jpg"
 ```
 
-Run full project:
+or:
 
 ```powershell
 python project.py --image "images/tiger.jpg"
 ```
 
-Run camera:
+The program produces:
+
+- annotated image with real bounding boxes
+- JSON result containing class name, category, confidence, and coordinates
+- processing time
+
+## Camera detection
 
 ```powershell
 python project.py --camera
 ```
 
-Train:
+## Custom training
 
-```powershell
-python train.py --data dataset/data.yaml --epochs 50
-```
+For the complete land + sea + bird scope, create a YOLO dataset using the required exact classes.
 
-After training, use the resulting best.pt as:
-
-```text
-models/best.pt
-```
-
-## Output
-
-Results are saved in:
-
-```text
-outputs/
-  <image>_detected.jpg
-  <image>_result.json
-```
-
-The JSON contains:
-
-- object name
-- major category
-- confidence percentage
-- confidence status
-- x1/y1/x2/y2 bounding-box coordinates
-- processing time
-
-## Dataset structure
+Dataset layout:
 
 ```text
 dataset/
@@ -105,18 +111,53 @@ dataset/
     └── val/
 ```
 
-Each image needs a YOLO label file with:
+Then create `dataset/data.yaml` based on `dataset/data.yaml.example`.
 
-```text
-class_id center_x center_y width height
+Train:
+
+```powershell
+python train.py --data dataset/data.yaml --epochs 50
 ```
 
-## Suggested intended categories
+After training, copy the best weights to:
 
-Land animals: dog, cat, lion, tiger, leopard, cheetah, elephant, horse, cow, buffalo, goat, sheep, deer, monkey, gorilla, bear, panda, wolf, fox, rabbit, zebra, giraffe, camel, kangaroo, hippopotamus, rhinoceros, pig, donkey, squirrel, rat, mouse.
+```text
+models/best.pt
+```
 
-Sea animals: shark, dolphin, whale, orca, seal, sea lion, walrus, octopus, squid, jellyfish, starfish, seahorse, crab, lobster, shrimp, turtle, sea turtle, stingray, eel, swordfish, tuna, salmon, clownfish, goldfish, pufferfish, angelfish, manta ray.
+## Evaluation
 
-Birds: eagle, sparrow, crow, parrot, peacock, pigeon, owl, hawk, falcon, swan, duck, goose, flamingo, penguin, ostrich, emu, kingfisher, woodpecker, hummingbird, parakeet, pelican, seagull, crane, heron, rooster, hen, turkey.
+Run the validation metrics with:
 
-Do not label a class as supported unless it exists in the trained model.
+```powershell
+python evaluate.py --data dataset/data.yaml --model models/best.pt
+```
+
+This reports validation metrics from the trained model. Use those measured metrics in the academic report instead of a prediction confidence.
+
+## Intended classes
+
+### Land animals
+Dog, Cat, Lion, Tiger, Leopard, Cheetah, Elephant, Horse, Cow, Buffalo, Goat, Sheep, Deer, Monkey, Gorilla, Bear, Panda, Wolf, Fox, Rabbit, Zebra, Giraffe, Camel, Kangaroo, Hippopotamus, Rhinoceros, Pig, Donkey, Squirrel, Rat, Mouse.
+
+### Sea animals
+Shark, Dolphin, Whale, Orca, Seal, Sea Lion, Walrus, Octopus, Squid, Jellyfish, Starfish, Seahorse, Crab, Lobster, Shrimp, Turtle, Sea Turtle, Stingray, Eel, Swordfish, Tuna, Salmon, Clownfish, Goldfish, Pufferfish, Angelfish, Manta Ray.
+
+### Birds
+Eagle, Sparrow, Crow, Parrot, Peacock, Pigeon, Owl, Hawk, Falcon, Swan, Duck, Goose, Flamingo, Penguin, Ostrich, Emu, Kingfisher, Woodpecker, Hummingbird, Parakeet, Pelican, Seagull, Crane, Heron, Rooster, Hen, Turkey.
+
+A class is supported only when it exists in the actual trained model.
+
+## Academic/project relevance
+
+The source project focuses on animal classification, localization, bounding boxes, confidence estimation, multiple-animal detection, and Python/YOLO-based computer vision. This implementation keeps that core concept and extends the intended category scope to land animals, sea animals and birds.
+
+## No fake data
+
+Do not add:
+- fake detection results
+- random confidence values
+- static bounding boxes
+- fabricated validation accuracy
+
+All predictions and localization coordinates must come from the loaded AI model.
