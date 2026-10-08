@@ -48,23 +48,6 @@ INTENDED = [
 
 model = None
 model_error = None
-try:
-    from ultralytics import YOLO
-    if Path(MODEL_PATH).exists():
-        model = YOLO(MODEL_PATH)
-    else:
-        model_error = f"Model file not found: {MODEL_PATH}"
-except Exception as exc:
-    model_error = str(exc)
-
-@app.get("/")
-def root():
-    return {
-        "name": "Animal Vision AI",
-        "status": "running",
-        "message": "Python AI API is online. Use /api/health, /api/classes and POST /api/predict.",
-        "api_docs": "/docs"
-    }
 
 app = FastAPI(
     title="Animal Vision AI",
@@ -80,6 +63,25 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/")
+def root():
+    return {
+        "name": "Animal Vision AI",
+        "status": "running",
+        "message": "Python AI API is online. Use /api/health, /api/classes and POST /api/predict.",
+        "api_docs": "/docs"
+    }
+
+try:
+    from ultralytics import YOLO
+    if Path(MODEL_PATH).exists():
+        model = YOLO(MODEL_PATH)
+    else:
+        model_error = f"Model file not found: {MODEL_PATH}"
+except Exception as exc:
+    model_error = str(exc)
+
 
 def confidence_status(c: float) -> str:
     if c >= 0.90: return "High Confidence"
