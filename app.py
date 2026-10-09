@@ -117,7 +117,7 @@ def classes():
             })
     return {
         "model_loaded": model is not None,
-        "model_name": Path(MODEL_PATH).name,
+        "model_name": (Path(MODEL_PATH).name if Path(MODEL_PATH).exists() else DEFAULT_MODEL),
         "actual_model_classes": names,
         "classes": payload
     }
@@ -204,7 +204,7 @@ async def predict(file: UploadFile = File(...)):
         "detections": detections,
         "processing_time_ms": round((time.perf_counter() - start) * 1000, 2),
         "annotated_image": f"data:image/jpeg;base64,{image_b64}",
-        "model_name": Path(MODEL_PATH).name,
+        "model_name": (Path(MODEL_PATH).name if Path(MODEL_PATH).exists() else DEFAULT_MODEL),
         "note": "Confidence is per-prediction confidence, not overall model accuracy."
     }
 
