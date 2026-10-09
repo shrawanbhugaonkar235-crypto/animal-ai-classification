@@ -67,11 +67,14 @@ app.add_middleware(
 )
 
 try:
-    from ultralytics import YOLO
+    from ultralytics import YOLO, YOLOWorld
     if Path(MODEL_PATH).exists():
         model = YOLO(MODEL_PATH)
     else:
-        model_error = f"Model file not found: {MODEL_PATH}"
+        # Open-vocabulary fallback: allows photo testing without a local best.pt.
+        model = YOLOWorld(DEFAULT_MODEL)
+        model.set_classes([name for _, names in INTENDED for name in names])
+        model_error = None
 except Exception as exc:
     model_error = str(exc)
 
@@ -95,7 +98,7 @@ def health():
     return {
         "status": "ok",
         "model_loaded": model is not None,
-        "model_name": Path(MODEL_PATH).name,
+        "model_name": (Path(MODEL_PATH).name if Path(MODEL_PATH).exists() else DEFAULT_MODEL),
         "model_error": model_error,
     }
 
