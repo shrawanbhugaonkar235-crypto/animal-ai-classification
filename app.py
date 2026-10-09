@@ -14,6 +14,7 @@ from PIL import Image, UnidentifiedImageError
 load_dotenv()
 ROOT = Path(__file__).resolve().parent
 MODEL_PATH = os.getenv("MODEL_PATH", str(ROOT / "models" / "best.pt"))
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "yolov8s-worldv2.pt")
 CONFIDENCE_THRESHOLD = float(os.getenv("CONFIDENCE_THRESHOLD", "0.25"))
 MAX_FILE_SIZE_MB = float(os.getenv("MAX_FILE_SIZE_MB", "4"))
 
