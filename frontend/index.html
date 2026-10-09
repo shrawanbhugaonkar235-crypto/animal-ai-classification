@@ -1,32 +1,120 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Animal Vision AI</title>
-<meta name="description" content="AI-based classification and localization of animals, sea animals and birds using Python and YOLO.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Animal Vision AI — Detection Console</title>
 <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-<header class="topbar"><div class="brand"><div class="logo">AI</div><div><strong>Animal Vision AI</strong><small>Classification & Localization</small></div></div>
-<nav id="nav"><button class="active" data-view="home">Home</button><button data-view="detect">AI Detection</button><button data-view="classes">Supported Classes</button><button data-view="how">How It Works</button><button data-view="about">About Project</button></nav><button id="menu" class="menu">☰</button></header>
-<main>
-<section id="home" class="view active"><div class="hero"><div><span class="eyebrow">Python · Computer Vision · YOLO</span><h1>Classify and localize <em>animals, sea animals and birds.</em></h1><p>Upload a photograph to run real AI inference, detect multiple objects, identify the model's class, draw bounding boxes and view prediction confidence.</p><div class="actions"><button class="btn primary" data-view="detect">Upload a Photo</button><button class="btn" data-view="classes">Check Model Coverage</button></div></div><div class="hero-visual"><div class="radar"><span>AI</span></div><b>DETECT → CLASSIFY → LOCALIZE</b><small>Real model inference • no fabricated results</small></div></div>
-<div class="features"><article><i>◉</i><h3>Object Detection</h3><p>YOLO/Ultralytics processes your uploaded photograph.</p></article><article><i>⌖</i><h3>Localization</h3><p>Real bounding-box coordinates come from the model.</p></article><article><i>%</i><h3>Confidence</h3><p>Shows the confidence for each individual prediction.</p></article><article><i>⊕</i><h3>Multiple Objects</h3><p>Several animals can be detected in one image.</p></article></div></section>
+<div class="app-shell">
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark">AI</div>
+      <div>
+        <strong>Animal Vision AI</strong>
+        <span>Classification & Localization</span>
+      </div>
+    </div>
+    <div class="header-status"><span class="dot"></span><span id="apiStatus">Checking AI API…</span></div>
+  </header>
 
-<section id="detect" class="view"><div class="page-head"><div><span class="eyebrow">AI Detection</span><h2>Upload a Photo</h2><p>JPG, JPEG, PNG or WEBP. Large images are resized/compressed in the browser before inference.</p></div><div id="health" class="status">Checking AI model…</div></div>
-<div class="detect-grid"><div class="panel"><div id="drop" class="drop"><input id="file" type="file" accept=".jpg,.jpeg,.png,.webp" hidden><div class="upload-icon">↑</div><h3>Drop your photo here</h3><p>or choose an image from your device</p><button id="browse" class="btn primary">Choose Photo</button><small>Recommended: under 4 MB after compression</small></div>
-<div id="previewBox" class="hidden"><img id="preview" alt="Selected photo"><div class="filebar"><strong id="filename"></strong><button id="remove" class="btn">Remove</button><button id="analyze" class="btn primary">Analyze Photo</button></div></div>
-<div id="loading" class="loading hidden">Running Python AI inference…</div><div id="error" class="error hidden"></div></div>
-<aside><div class="panel"><h3>Result includes</h3><p>✓ Class / species name<br>✓ Major category<br>✓ Confidence score<br>✓ Bounding box<br>✓ Multiple detections<br>✓ Processing time</p></div><div class="panel note"><h3>Confidence ≠ Accuracy</h3><p>Confidence belongs to one prediction. Overall model accuracy must come from validation/testing.</p></div></aside></div>
-<div id="results" class="hidden results"><div class="page-head"><div><span class="eyebrow">Result Dashboard</span><h2>Detection Results</h2></div><button id="newPhoto" class="btn">New Photo</button></div>
-<div class="summary"><div><small>Total Objects</small><b id="total">0</b></div><div><small>Land Animals</small><b id="land">0</b></div><div><small>Sea Animals</small><b id="sea">0</b></div><div><small>Birds</small><b id="birds">0</b></div><div><small>Avg. Confidence</small><b id="avg">0%</b></div><div><small>Processing</small><b id="ptime">0 ms</b></div></div>
-<div class="result-grid"><div class="panel result-image"><div class="result-bar"><span id="model"></span><small>REAL INFERENCE</small></div><img id="output" alt="Annotated result"></div><div class="panel"><div class="filters"><input id="search" placeholder="Search detected name…"><select id="category"><option>All</option><option>Land Animal</option><option>Sea Animal</option><option>Bird</option><option>Other</option></select><select id="confidence"><option value="0">All Confidence</option><option value="50">Above 50%</option><option value="70">Above 70%</option><option value="80">Above 80%</option><option value="90">Above 90%</option></select></div><div id="list"></div></div></div>
-<div class="footnote">The confidence displayed here is an individual prediction score, not the overall accuracy of the trained model.</div></div></section>
+  <main class="workspace">
+    <section class="intro">
+      <div>
+        <div class="eyebrow">AI DETECTION CONSOLE</div>
+        <h1>Upload a photo and analyze it.</h1>
+        <p>Real Python + FastAPI + YOLO inference. Detect supported animals, sea animals and birds, then view the class, confidence and bounding box.</p>
+      </div>
+      <div class="model-chip" id="modelChip">Model: checking…</div>
+    </section>
 
-<section id="classes" class="view"><div class="page-head"><div><span class="eyebrow">Model Coverage</span><h2>Supported Classes</h2><p>✓ means the currently loaded model actually exposes that class.</p></div></div><div id="coverage" class="panel"></div><div class="panel class-group"><h3>🐾 Land / General Animals</h3><div id="landClasses" class="chips"></div></div><div class="panel class-group"><h3>🌊 Sea / Aquatic Animals</h3><div id="seaClasses" class="chips"></div></div><div class="panel class-group"><h3>🦅 Birds</h3><div id="birdClasses" class="chips"></div></div></section>
+    <section class="workspace-grid">
+      <div class="panel upload-panel">
+        <input id="fileInput" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" hidden>
+        <div id="dropZone" class="drop-zone">
+          <div class="upload-icon">↑</div>
+          <h2>Upload photo</h2>
+          <p>Choose an image or drag it here.</p>
+          <button id="chooseBtn" class="primary-btn" type="button">Choose Photo</button>
+          <small>JPG · JPEG · PNG · WEBP</small>
+        </div>
 
-<section id="how" class="view"><div class="page-head"><div><span class="eyebrow">System Workflow</span><h2>How It Works</h2></div></div><div class="steps"><article><b>01</b><h3>Upload</h3><p>Select a photo.</p></article><article><b>02</b><h3>Validate</h3><p>Check type and size.</p></article><article><b>03</b><h3>Preprocess</h3><p>Resize and prepare image.</p></article><article><b>04</b><h3>Detect</h3><p>YOLO finds objects.</p></article><article><b>05</b><h3>Classify</h3><p>Read the model class.</p></article><article><b>06</b><h3>Localize</h3><p>Render bounding boxes.</p></article></div><div class="architecture"><span>HTML5 + CSS3 + JS</span><b>→</b><span>FastAPI / Python</span><b>→</b><span>YOLO / Ultralytics</span><b>→</b><span>JSON + Annotated Image</span></div></section>
+        <div id="selectedPanel" class="selected-panel hidden">
+          <div class="selected-head">
+            <div>
+              <div class="eyebrow">SELECTED IMAGE</div>
+              <strong id="fileName">photo.jpg</strong>
+            </div>
+            <button id="changeBtn" class="secondary-btn" type="button">Change</button>
+          </div>
+          <img id="preview" class="preview" alt="Selected photo">
+          <button id="analyzeBtn" class="primary-btn analyze-btn" type="button">Analyze Photo</button>
+          <div id="loading" class="loading hidden"><span class="spinner"></span>Running AI inference…</div>
+          <div id="error" class="error hidden"></div>
+        </div>
+      </div>
 
-<section id="about" class="view"><div class="page-head"><div><span class="eyebrow">Academic Project</span><h2>About Project</h2></div></div><div class="about-grid"><div class="panel"><h3>Project concept</h3><p>This application preserves the original animal classification and localization concept and expands its intended scope to land animals, sea animals and birds.</p><p>Classification identifies the class supplied by the model; localization identifies object position with a bounding box.</p></div><div class="panel"><h3>Applications</h3><p>Wildlife monitoring · Conservation · Agriculture · Smart surveillance · Animal tracking · Research & education.</p></div><div class="panel"><h3>Future scope</h3><p>Custom multi-species training · video detection · real-time camera tracking · mobile application · edge deployment.</p></div></div></section>
-</main><footer>Animal Vision AI · HTML5 · CSS3 · JavaScript · Python · FastAPI · YOLO/Ultralytics</footer>
-<script src="./config.js"></script><script src="./app.js"></script></body></html>
+      <aside class="panel info-panel">
+        <div class="eyebrow">PROJECT OUTPUT</div>
+        <h2>What the model returns</h2>
+        <div class="info-list">
+          <div><span>01</span><p><b>Object name</b><br>Class returned by the trained model.</p></div>
+          <div><span>02</span><p><b>Category</b><br>Land Animal, Sea Animal or Bird.</p></div>
+          <div><span>03</span><p><b>Confidence</b><br>Individual prediction confidence.</p></div>
+          <div><span>04</span><p><b>Localization</b><br>Actual bounding-box coordinates.</p></div>
+        </div>
+        <div class="warning"><b>Accuracy note:</b> prediction confidence is not overall model accuracy. Overall accuracy must be measured on a validation/test dataset.</div>
+      </aside>
+    </section>
+
+    <section id="results" class="hidden">
+      <div class="results-head">
+        <div><div class="eyebrow">AI RESULT</div><h2>Detection Result</h2></div>
+        <button id="newPhotoBtn" class="secondary-btn" type="button">Analyze Another</button>
+      </div>
+
+      <div class="stats">
+        <div><span>Total Objects</span><b id="total">0</b></div>
+        <div><span>Land Animals</span><b id="land">0</b></div>
+        <div><span>Sea Animals</span><b id="sea">0</b></div>
+        <div><span>Birds</span><b id="birds">0</b></div>
+        <div><span>Avg. Confidence</span><b id="avg">0%</b></div>
+        <div><span>Processing</span><b id="time">0 ms</b></div>
+      </div>
+
+      <div class="result-grid">
+        <div class="panel result-image-panel">
+          <div class="result-toolbar"><span id="resultModel">Model</span><span>REAL INFERENCE</span></div>
+          <img id="resultImage" alt="Annotated result">
+        </div>
+        <div class="panel detections-panel">
+          <div class="filters">
+            <input id="search" placeholder="Search detected name">
+            <select id="category">
+              <option value="All">All Categories</option>
+              <option value="Land Animal">Land Animals</option>
+              <option value="Sea Animal">Sea Animals</option>
+              <option value="Bird">Birds</option>
+              <option value="Other">Other</option>
+            </select>
+            <select id="confidence">
+              <option value="0">All Confidence</option>
+              <option value="50">Above 50%</option>
+              <option value="70">Above 70%</option>
+              <option value="80">Above 80%</option>
+              <option value="90">Above 90%</option>
+            </select>
+          </div>
+          <div id="detectionList"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>Animal Vision AI · Python · FastAPI · YOLO/Ultralytics · HTML5 · CSS3 · JavaScript</footer>
+</div>
+<script src="./config.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
