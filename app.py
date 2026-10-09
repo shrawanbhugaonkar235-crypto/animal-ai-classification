@@ -8,6 +8,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from PIL import Image, UnidentifiedImageError
 
 load_dotenv()
@@ -48,6 +49,7 @@ INTENDED = [
 
 model = None
 model_error = None
+FRONTEND_DIR = ROOT / "frontend"
 
 app = FastAPI(
     title="Animal Vision AI",
@@ -63,15 +65,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-@app.get("/")
-def root():
-    return {
-        "name": "Animal Vision AI",
-        "status": "running",
-        "message": "Python AI API is online. Use /api/health, /api/classes and POST /api/predict.",
-        "api_docs": "/docs"
-    }
 
 try:
     from ultralytics import YOLO
@@ -210,3 +203,7 @@ async def predict(file: UploadFile = File(...)):
         "model_name": Path(MODEL_PATH).name,
         "note": "Confidence is per-prediction confidence, not overall model accuracy."
     }
+
+# Serve the frontend from the same Render service.
+# API routes are registered before this mount, so /api/* remains available.
+app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
