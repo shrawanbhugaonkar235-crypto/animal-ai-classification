@@ -37,7 +37,7 @@ async function analyze(){
   $("loading").classList.remove("hidden");$("analyze").disabled=true;hideError();
   try{
     const file=await compressImage(selected),fd=new FormData();fd.append("file",file);
-    const r=await fetch(api("/api/predict",{method:"POST",body:fd}),d=await r.json();
+    const r=await fetch(api("/api/predict"),{method:"POST",body:fd}),d=await r.json();
     if(!r.ok)throw Error(d.detail||"Prediction failed.");
     detections=d.detections||[]; $("results").classList.remove("hidden");
     $("total").textContent=d.total_detections;$("land").textContent=d.summary.land_animals;$("sea").textContent=d.summary.sea_animals;$("birds").textContent=d.summary.birds;$("avg").textContent=d.summary.average_confidence+"%";$("ptime").textContent=d.processing_time_ms+" ms";$("model").textContent=d.model_name;$("output").src=d.annotated_image+"?t="+Date.now();renderList()
